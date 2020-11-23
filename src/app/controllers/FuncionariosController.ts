@@ -3,19 +3,25 @@ import { getRepository } from 'typeorm';
 import Funcionarios from '../models/Funcionarios';
 
 interface Request {
-  name_func: string;
-  email_func: string;
-  foto_func: string;
+  name: string;
+  funcao: string;
+  departamento: string;
+  email: string;
+  telefone: string;
+  foto: string;
 }
 class FuncionariosController {
   public async store({
-    name_func,
-    email_func,
-    foto_func,
+    name,
+    funcao,
+    departamento,
+    email,
+    telefone,
+    foto
   }: Request): Promise<Funcionarios> {
     const funcionariosRepository = getRepository(Funcionarios);
     const verificaFuncionarioExiste = await funcionariosRepository.findOne({
-      where: { email_func },
+      where: { email },
     });
 
     if (verificaFuncionarioExiste) {
@@ -23,9 +29,12 @@ class FuncionariosController {
     }
 
     const funcionario = funcionariosRepository.create({
-      name_func,
-      email_func,
-      foto_func,
+      name,
+      funcao,
+      departamento,
+      email,
+      telefone,
+      foto
     });
 
     await funcionariosRepository.save(funcionario);

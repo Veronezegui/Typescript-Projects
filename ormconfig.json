@@ -4,7 +4,7 @@
   "port": 5432,
   "username": "postgres",
   "password": "12345",
-  "database": "si_projeto",
+  "database": "node_api",
   "entities": [
     "./src/app/models/*.ts*"
   ],

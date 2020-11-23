@@ -4,23 +4,22 @@ import multer from 'multer';
 import uploadConfig from '../config/upload';
 import FuncionariosController from '../app/controllers/FuncionariosController';
 import Funcionarios from '../app/models/Funcionarios';
-import ensureAuthenticated from '../middleawares/ensureAuthenticated';
-import FotoFuncController from '../app/controllers/FotoFuncController';
 
 const funcionariosRouter = Router();
 const upload = multer(uploadConfig);
 
-funcionariosRouter.use(ensureAuthenticated);
 
-funcionariosRouter.post('/', async (request, response) => {
+funcionariosRouter.post('/', upload.single('foto'), async (request, response) => {
   try {
-    const { name_func, email_func, foto_func } = request.body;
-
+    const { name, funcao, departamento, email, telefone} = request.body;
     const funcionariosController = new FuncionariosController();
     const funcionario = await funcionariosController.store({
-      name_func,
-      email_func,
-      foto_func,
+      name,
+      funcao,
+      departamento,
+      email,
+      telefone,
+      foto: request.file.filename
     });
 
     return response.json(funcionario);
@@ -31,14 +30,14 @@ funcionariosRouter.post('/', async (request, response) => {
 
 funcionariosRouter.get('/', async (request, response) => {
   const funcionariosRepositorio = getRepository(Funcionarios);
-  const funcionario = await funcionariosRepositorio.find();
+  const funcionario = await funcionariosRepositorio.find({select: ['name','funcao' ,'departamento', 'email', 'telefone', 'foto']});
   return response.json(funcionario);
 });
 
 funcionariosRouter.get('/:id', async (request, response) => {
   const funcionariosRepositorio = getRepository(Funcionarios);
   const { id } = request.params;
-  const funcionario = await funcionariosRepositorio.findOne(id);
+  const funcionario = await funcionariosRepositorio.findOne(id, {select: ['name', 'departamento', 'email', 'telefone', 'foto']});
   return response.json(funcionario);
 });
 
@@ -49,26 +48,8 @@ funcionariosRouter.delete('/:id', async (request, response) => {
   return response.send();
 });
 
-funcionariosRouter.patch(
-  '/foto/:id',
-  upload.single('foto_func'),
-  async (request, response) => {
-    try {
-      const fotoFuncController = new FotoFuncController();
-      const funcionario = await fotoFuncController.update({
-        id_func: request.params.id,
-        foto_funcFileName: request.file.filename,
-      });
-      console.log(request.file);
-      return response.json(funcionario);
-    } catch (err) {
-      return response.status(400).json({ error: err.message });
-    }
-  },
-);
-
 funcionariosRouter.put('/:id', async (request, response) => {
-  const { email, name } = request.body;
+  const {name, funcao, departamento, email, telefone, foto } = request.body;
 
   const funcionariosRepositorio = getRepository(Funcionarios);
   const { id } = request.params;
@@ -76,10 +57,42 @@ funcionariosRouter.put('/:id', async (request, response) => {
   if (!funcionario) {
     return response.json({ message: 'Funcionário não encontrado' });
   }
-  funcionario.email_func = email;
-  funcionario.name_func = name;
+  funcionario.name = name;
+  funcionario.funcao = funcao;
+  funcionario.departamento = departamento;
+  funcionario.email = email;
+  funcionario.telefone = telefone;
+  funcionario.foto = foto;
+  
   await funcionariosRepositorio.save(funcionario);
   return response.json(funcionario);
 });
+
+funcionariosRouter.put('/like/:id', async (request, response) => {
+  const funcionariosRepositorio = getRepository(Funcionarios);
+  const { id } = request.params;
+  const funcionario = await funcionariosRepositorio.findOne(id);
+  if (!funcionario) {
+    return response.json({ message: 'Funcionário não encontrado' });
+  }
+  funcionario.like = funcionario.like + 1
+  
+  await funcionariosRepositorio.save(funcionario);
+  return response.json(funcionario);
+});
+
+funcionariosRouter.put('/deslike/:id', async (request, response) => {
+  const funcionariosRepositorio = getRepository(Funcionarios);
+  const { id } = request.params;
+  const funcionario = await funcionariosRepositorio.findOne(id);
+  if (!funcionario) {
+    return response.json({ message: 'Funcionário não encontrado' });
+  }
+  funcionario.deslike = funcionario.deslike + 1
+  
+  await funcionariosRepositorio.save(funcionario);
+  return response.json(funcionario);
+});
+
 
 export default funcionariosRouter;

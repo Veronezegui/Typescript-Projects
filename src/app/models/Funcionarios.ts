@@ -4,21 +4,43 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+
+
+import Dependentes from './Dependentes'
 
 @Entity('funcionarios')
 class Funcionarios {
   @PrimaryGeneratedColumn('uuid')
-  id_func: string;
+  id: string;
 
   @Column()
-  name_func: string;
+  name: string;
 
   @Column()
-  email_func: string;
+  funcao: string;
 
   @Column()
-  foto_func: string;
+  departamento: string;
+
+  @Column()
+  email: string;
+
+  @Column()
+  telefone: string;
+
+  @Column()
+  foto: string;
+
+  @Column()
+  like: number;
+
+  @Column()
+  deslike: number;
+
+  @OneToMany(() => Dependentes, dep => dep.id_func)
+  dep: Dependentes
 
   @CreateDateColumn()
   created_at: Date;

@@ -3,11 +3,8 @@ declare namespace Express {
     funcionario: {
       id: string;
     };
-    curso: {
+    dependentes: {
       id: string;
-    };
-    treinamentos: {
-      id: string;
-    };
+    }
   }
 }

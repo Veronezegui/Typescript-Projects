@@ -1,31 +1,52 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export default class CriarFuncionarios1601158693277
-  implements MigrationInterface {
+export default class CriarFuncionarios1601158693277 {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
         name: 'funcionarios',
         columns: [
           {
-            name: 'id_func',
+            name: 'id',
             type: 'uuid',
             isPrimary: true,
             generationStrategy: 'uuid',
             default: 'uuid_generate_v4()',
           },
           {
-            name: 'name_func',
+            name: 'name',
             type: 'varchar',
           },
           {
-            name: 'email_func',
+            name: 'funcao',
+            type: 'varchar',
+          },
+          {
+            name: 'departamento',
+            type: 'varchar',
+          },
+          {
+            name: 'email',
             type: 'varchar',
             isUnique: true,
           },
           {
-            name: 'foto_func',
+            name: 'telefone',
             type: 'varchar',
+          },
+          {
+            name: 'foto',
+            type: 'varchar',
+            isNullable: true,
+          },
+          {
+            name: 'like',
+            type: 'integer',
+            isNullable: true,
+          },
+          {
+            name: 'deslike',
+            type: 'integer',
             isNullable: true,
           },
           {
